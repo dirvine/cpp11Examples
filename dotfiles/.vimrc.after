@@ -1,0 +1,143 @@
+filetype plugin indent on
+" reset to vim-defaults
+if &compatible          " only if not set before:
+    set nocompatible      " use vim-defaults instead of vi-defaults (easier, more user friendly)
+endif
+
+" display settings
+set background=dark     " enable for dark terminals
+set nowrap              " dont wrap lines
+set scrolloff=2         " 2 lines above/below cursor when scrolling
+set number              " show line numbers
+set showmatch           " show matching bracket (briefly jump)
+set showmode            " show mode in status bar (insert/replace/...)
+set showcmd             " show typed command in status bar
+set ruler               " show cursor position in status bar
+set title               " show file in titlebar
+set wildmenu            " completion with menu
+set wildignore=*.o,*.obj,*.bak,*.exe,*.py[co],*.swp,*~,*.pyc,.svn
+set laststatus=2        " use 2 lines for the status bar
+set matchtime=2         " show matching bracket for 0.2 seconds
+set matchpairs+=<:>     " specially for html
+
+" editor settings
+set esckeys             " map missed escape sequences (enables keypad keys)
+set ignorecase          " case insensitive searching
+set smartcase           " but become case sensitive if you type uppercase characters
+set smartindent         " smart auto indenting
+set smarttab            " smart tab handling for indenting
+set magic               " change the way backslashes are used in search patterns
+set bs=indent,eol,start " Allow backspacing over everything in insert mode
+
+set tabstop=2           " number of spaces a tab counts for
+set shiftwidth=2        " spaces for autoindents
+set expandtab           " turn a tabs into spaces
+
+set fileformat=unix     " file mode is unix
+"set fileformats=unix,dos    # only detect unix file format, displays that ^M with dos files
+
+" system settings
+set lazyredraw          " no redraws in macros
+set confirm             " get a dialog when :q, :w, or :wq fails
+set nobackup            " no backup~ files.
+set viminfo='20,\"500   " remember copy registers after quitting in the .viminfo file -- 20 jump links, regs up to 500 lines'
+set hidden              " remember undo after quitting
+set history=50          " keep 50 lines of command history
+set mouse=a             " use mouse in visual, normal,insert,command,help mode (shift key disables)
+
+set incsearch
+" color settings (if terminal/gui supports it)
+if &t_Co > 2 || has("gui_running")
+    syntax on          " enable colors
+    set hlsearch       " highlight search (very useful!)
+   set incsearch       "search incremently (search while typing)
+endif
+
+highlight LongLine ctermbg=DarkYellow guibg=DarkYellow
+highlight WhitespaceEOL ctermbg=DarkYellow guibg=DarkYellow
+if v:version >= 702
+  " Lines longer than 100 columns.
+  au BufWinEnter * let w:m0=matchadd('LongLine', '\%>100v.\+', -1)
+
+  " Whitespace at the end of a line. This little dance suppresses
+  " whitespace that has just been typed.
+  au BufWinEnter * let w:m1=matchadd('WhitespaceEOL', '\s\+$', -1)
+  au InsertEnter * call matchdelete(w:m1)
+  au InsertEnter * let w:m2=matchadd('WhitespaceEOL', '\s\+\%#\@<!$', -1)
+  au InsertLeave * call matchdelete(w:m2)
+  au InsertLeave * let w:m1=matchadd('WhitespaceEOL', '\s\+$', -1)
+else
+  au BufRead,BufNewFile * syntax match LongLine /\%>100v.\+/
+  au InsertEnter * syntax match WhitespaceEOL /\s\+\%#\@<!$/
+  au InsertLeave * syntax match WhitespaceEOL /\s\+$/
+endif
+set nocompatible
+" FOLDING
+augroup vimrc
+    au BufReadPre * setlocal foldmethod=indent
+      au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+augroup END
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space> zf
+set nofoldenable
+" Optional
+" C/C++ programming helpers
+augroup csrc
+  au!
+  autocmd FileType *      set nocindent smartindent
+  autocmd FileType c,cpp,cc  set cindent
+augroup END
+" Set a few indentation parameters. See the VIM help for cinoptions-values for
+" details.  These aren't absolute rules; they're just an approximation of
+" common style in LLVM source.
+set cinoptions=:0,g0,(0,Ws,l1
+" Add and delete spaces in increments of `shiftwidth' for tabs
+set smarttab
+" Delete trailing whitespace and tabs at the end of each line
+command! DeleteTrailingWs :%s/\s\+$//
+
+" Convert all tab characters to two spaces
+command! Untab :%s/\t/  /g
+"set makeprg=clang++ 
+colorscheme desert
+let g:clang_complete_auto = 1
+let g:clang_use_library = 1
+let g:clang_library_path = "/usr/lib/"
+au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") |
+                      \ exe "normal g'\"" | endif 
+
+function OpenNERDTree()
+    execute ":NERDTree"
+endfunction
+command -nargs=0 OpenNERDTree :call OpenNERDTree()
+nmap <ESC>t :OpenNERDTree<CR>
+
+
+" Automatically open, but do not go to (if there are errors) the quickfix /
+" " location list window, or close it when is has become empty.
+" "
+" " Note: Must allow nesting of autocmds to enable any customizations for
+" quickfix
+" " buffers.
+" " Note: Normally, :cwindow jumps to the quickfix window if the command opens
+" it
+" " (but not if it's already open). However, as part of the autocmd, this
+" doesn't
+" " seem to happen.
+autocmd QuickFixCmdPost [^l]* nested cwindow
+autocmd QuickFixCmdPost    l* nested lwindow
+":cc      see the current error
+":cn      next error
+":cp      previous error
+":clist   list all errors
+au FileType qf call AdjustWindowHeight(3, 10)
+function! AdjustWindowHeight(minheight, maxheight)
+    exe max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
+  endfunction
+set switchbuf+=usetab,newtab
+map <C-t><up> :tabr<cr>
+map <C-t><down> :tabl<cr>
+map <C-t><left> :tabp<cr>
+map <C-t><right> :tabn<cr>
+set errorformat^=%-GIn\ file\ included\ %.%# 
+set path=../src/*/include,../src/*/src/,../src/,../src/third_party_libs/boost/,../src/,/usr/include/c++/v1,/usr/include/
