@@ -15,21 +15,20 @@
  *
  * =====================================================================================
  */
-#include <iostream>
+#include "catch.hpp"
 
  struct A { }; 
  struct B { 
-   B(A a) { 
-   std::cout << "B ctor\n"; 
+   B(A /* a */) { 
+   printf("stuff"); 
    } 
  }; 
-int main() {
+TEST_CASE("most vexing parse", "mvp") {
 // this will not print anything  
-  B b(A());
-// the fix is uniform initialisation 
-  B c(A{});
-  // this is an extended initialiser list and may nto be available on your compiler 
-//  B d{A{}};
-  return 0;
+//   CHECK(1 == B b(A()));
+// // the fix is uniform initialisation 
+//   CHECK(1 == B c(A{}));
+//   // this is an extended initialiser list and may nto be available on your compiler 
+//   CHECK(1 == B d{A{}});
 }
 

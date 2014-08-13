@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include "catch.hpp"
 using namespace std;
 
 // forward-declaration to allow use in Iter
@@ -60,11 +60,11 @@ Iter::operator* () const {
 }
 
 // sample usage of the range-based for loop on IntVector
-int main()
-{
+TEST_CASE("range based for", "[rbf]") {
   IntVector v;
   for ( int i = 0; i < 100; i++ ) {
     v.set( i , i );
   }
-  for ( int i : v ) { cout << i << endl; }
+  int j(0);
+  for ( int i : v ) { CHECK( (i + 1) == ++j); }
 }

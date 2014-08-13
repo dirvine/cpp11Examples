@@ -2,10 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "catch.hpp"
 
-
-int main()
-{
+TEST_CASE("task manager", "[task]") {
   //    std::cout << "Main thread id: " << std::this_thread::get_id()
   //        << std::endl;
   auto func = [&]
@@ -14,7 +13,7 @@ int main()
        std::ostringstream oss;
        oss << std::this_thread::get_id();
        std::string output(oss.str());
-        printf(" thread %s \n", output.c_str());
+       // printf(" thread %s \n", output.c_str());
     };
 
   std::vector<std::future<void> > vec;
