@@ -1,3 +1,4 @@
+#define CATCH_CONFIG_MAIN 
 // /*
 //  * =====================================================================================
 //  *
@@ -15,9 +16,9 @@
 //  *
 //  * =====================================================================================
 //  */
-// #include <iostream>
-// #include <cstdlib>
-// 
+ #include <iostream>
+ #include <cstdlib>
+#include "catch.hpp"
 // struct C {
 //     C() { std::cout << "Making a C\n"; }
 //     ~C() { std::cout << "Destroying a C\n";}

@@ -1,4 +1,6 @@
+#define CATCH_CONFIG_MAIN 
 #include "catch.hpp"
+
 enum class ConnectType : int32_t {
     kSingle = 100,
     kClosest,
